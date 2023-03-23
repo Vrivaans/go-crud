@@ -9,8 +9,14 @@ import (
 func PostsCreate(c *gin.Context) {
 	//Get data off req body
 
+	var body struct {
+		Body  string
+		Title string
+	}
+	c.Bind(&body)
+
 	//Crea un Posteo
-	post := models.Post{Title: "Hola mundo", Body: "Hola mundo desde Go, Gin, GORM"}
+	post := models.Post{Title: body.Title, Body: body.Body}
 	result := initializers.DB.Create(&post)
 
 	if result.Error != nil {
@@ -21,5 +27,16 @@ func PostsCreate(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"post": post,
+	})
+}
+
+func PostIndex(c *gin.Context) {
+	//Obtener los posts
+	var posts []models.Post
+	initializers.DB.Find(&posts)
+
+	//Responder los posts
+	c.JSON(200, gin.H{
+		"posts": posts,
 	})
 }
