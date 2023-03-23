@@ -40,3 +40,47 @@ func PostIndex(c *gin.Context) {
 		"posts": posts,
 	})
 }
+
+func PostsShow(c *gin.Context) {
+	id := c.Param("id")
+
+	var post models.Post
+	initializers.DB.First(&post, id)
+	c.JSON(200, gin.H{
+		"posts": post,
+	})
+}
+
+func PostUpdate(c *gin.Context) {
+	//Obtengo el id del parámetro
+	id := c.Param("id")
+
+	//Obtengo lo que se quiere actualizar
+	var body struct {
+		Body  string
+		Title string
+	}
+	c.Bind(&body)
+
+	//Capturo el objeto a actualizar
+	var post models.Post
+	initializers.DB.First(&post, id)
+
+	//Actualizamos
+	initializers.DB.Model(&post).Updates(models.Post{
+		Title: body.Title, Body: body.Body,
+	})
+
+	//Envío la respuesta
+	c.JSON(200, gin.H{
+		"posts": post,
+	})
+
+}
+
+func PostDelete(c *gin.Context) {
+	id := c.Param("id")
+	initializers.DB.Delete(&models.Post{}, id)
+
+	c.Status(200)
+}
